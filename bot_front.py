@@ -30,17 +30,30 @@ async def cmd_clear(message: types.Message):
 
 @dp.message_handler(commands='start')
 async def cmd_start(message: types.Message):
-    """Checking the date and cache"""
+    """Checking the cache in dict"""
 
-    keyboard = one_but_keyboard('New day')
-    date = get_date()
-    if no_date(date):  # check for data
+    if await is_new_date(message):
+        keyboard = one_but_keyboard('New day')
         if not new_dict:
             await message.answer('I\'ve got no cache', reply_markup=keyboard)
         else:
             await message.answer('Type /clear to clear the cache', reply_markup=keyboard)
+
+
+async def is_new_date(message):
+    """Checking the date for unique"""
+
+    date = get_date()
+    if no_date(date):
+        return True
     else:
-        await message.answer('We\'ve already added info for today!')
+        await send_respond(message)
+
+
+async def send_respond(message):
+    """Notify about data in database"""
+
+    await message.answer('We\'ve already added info for today!')
 
 
 def one_but_keyboard(but_text):
@@ -54,58 +67,64 @@ def one_but_keyboard(but_text):
 
 @dp.message_handler(Text(equals='New day'))
 async def get_date_day(message: types.Message):
-    """Get date & day to dict"""
+    """Save date & day to dict"""
 
-    new_dict['date'] = get_date()
-    new_dict['day'] = get_day()
-    keyboard = one_but_keyboard('New out')
-    await message.answer('Date & day: success', reply_markup=keyboard)
+    if await is_new_date(message):
+        new_dict['date'] = get_date()
+        new_dict['day'] = get_day()
+        keyboard = one_but_keyboard('New out')
+        await message.answer('Date & day: success', reply_markup=keyboard)
 
 
 @dp.message_handler(Text(equals='New out'))
 async def get_out(message: types.Message):
     """Save out-time to dict"""
 
-    new_dict['out'] = get_time()
-    keyboard = one_but_keyboard('New bus')
-    await message.answer('Out: success', reply_markup=keyboard)
+    if await is_new_date(message):
+        new_dict['out'] = get_time()
+        keyboard = one_but_keyboard('New bus')
+        await message.answer('Out: success', reply_markup=keyboard)
 
 
 @dp.message_handler(Text(equals='New bus'))
 async def get_bus(message: types.Message):
     """Save bus-time to dict"""
 
-    new_dict['bus'] = get_time()
-    keyboard = one_but_keyboard('New sub')
-    await message.answer('Bus: success', reply_markup=keyboard)
+    if await is_new_date(message):
+        new_dict['bus'] = get_time()
+        keyboard = one_but_keyboard('New sub')
+        await message.answer('Bus: success', reply_markup=keyboard)
 
 
 @dp.message_handler(Text(equals='New sub'))
 async def get_sub(message: types.Message):
     """Save sub-time to dict"""
 
-    new_dict['sub'] = get_time()
-    keyboard = one_but_keyboard('New school')
-    await message.answer('Sub: success', reply_markup=keyboard)
+    if await is_new_date(message):
+        new_dict['sub'] = get_time()
+        keyboard = one_but_keyboard('New school')
+        await message.answer('Sub: success', reply_markup=keyboard)
 
 
 @dp.message_handler(Text(equals='New school'))
 async def get_school(message: types.Message):
     """Save school-time to dict"""
 
-    new_dict['school'] = get_time()
-    keyboard = one_but_keyboard('Confirm')
-    keyboard.one_time_keyboard = True
-    await message.answer('School: success', reply_markup=keyboard)
+    if await is_new_date(message):
+        new_dict['school'] = get_time()
+        keyboard = one_but_keyboard('Confirm')
+        keyboard.one_time_keyboard = True
+        await message.answer('School: success', reply_markup=keyboard)
 
 
 @dp.message_handler(Text(equals='Confirm'))
 async def confirm(message: types.Message):
     """Confirm all the data to the database"""
 
-    to_base(new_dict)
-    new_dict.clear()
-    await message.answer('Done')
+    if await is_new_date(message):
+        to_base(new_dict)
+        new_dict.clear()
+        await message.answer('Done')
 
 
 if __name__ == '__main__':
