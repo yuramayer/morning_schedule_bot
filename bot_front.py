@@ -12,6 +12,10 @@ bot_token = getenv("BOT_TOKEN")
 if not bot_token:
     exit('Error: no token provided')
 
+user_id = int(getenv("USER_ID"))
+if not user_id:
+    exit('Error: no user id provided')
+
 bot = Bot(token=bot_token)
 
 dp = Dispatcher(bot)
@@ -23,21 +27,40 @@ logging.basicConfig(level=logging.INFO)
 async def cmd_clear(message: types.Message):
     """Clearing the dictionary with cache"""
 
-    new_dict.clear()
-    keyboard = one_but_keyboard('New day')
-    await message.answer('Dictionary is cleared', reply_markup=keyboard)
+    if await is_right_date_and_id(message):
+        new_dict.clear()
+        keyboard = one_but_keyboard('New day')
+        await message.answer('Dictionary is cleared', reply_markup=keyboard)
 
 
 @dp.message_handler(commands='start')
 async def cmd_start(message: types.Message):
     """Checking the cache in dict"""
 
-    if await is_new_date(message):
+    if await is_right_date_and_id(message):
         keyboard = one_but_keyboard('New day')
         if not new_dict:
             await message.answer('I\'ve got no cache', reply_markup=keyboard)
         else:
             await message.answer('Type /clear to clear the cache', reply_markup=keyboard)
+
+
+async def is_right_date_and_id(message):
+    """Checking date & id for all the funcs"""
+
+    if await is_right_id(message):
+        if await is_new_date(message):
+            return True
+
+
+async def is_right_id(message):
+    """Checking the id"""
+
+    verifiable_id = int(message.chat.id)
+    if user_id == verifiable_id:
+        return True
+    else:
+        await message.answer('You\'re not user.')
 
 
 async def is_new_date(message):
@@ -47,13 +70,7 @@ async def is_new_date(message):
     if no_date(date):
         return True
     else:
-        await send_respond(message)
-
-
-async def send_respond(message):
-    """Notify about data in database"""
-
-    await message.answer('We\'ve already added info for today!')
+        await message.answer('We\'ve already added info for today!')
 
 
 def one_but_keyboard(but_text):
@@ -69,7 +86,7 @@ def one_but_keyboard(but_text):
 async def get_date_day(message: types.Message):
     """Save date & day to dict"""
 
-    if await is_new_date(message):
+    if await is_right_date_and_id(message):
         new_dict['date'] = get_date()
         new_dict['day'] = get_day()
         keyboard = one_but_keyboard('New out')
@@ -80,7 +97,7 @@ async def get_date_day(message: types.Message):
 async def get_out(message: types.Message):
     """Save out-time to dict"""
 
-    if await is_new_date(message):
+    if await is_right_date_and_id(message):
         new_dict['out'] = get_time()
         keyboard = one_but_keyboard('New bus')
         await message.answer('Out: success', reply_markup=keyboard)
@@ -90,7 +107,7 @@ async def get_out(message: types.Message):
 async def get_bus(message: types.Message):
     """Save bus-time to dict"""
 
-    if await is_new_date(message):
+    if await is_right_date_and_id(message):
         new_dict['bus'] = get_time()
         keyboard = one_but_keyboard('New sub')
         await message.answer('Bus: success', reply_markup=keyboard)
@@ -100,7 +117,7 @@ async def get_bus(message: types.Message):
 async def get_sub(message: types.Message):
     """Save sub-time to dict"""
 
-    if await is_new_date(message):
+    if await is_right_date_and_id(message):
         new_dict['sub'] = get_time()
         keyboard = one_but_keyboard('New school')
         await message.answer('Sub: success', reply_markup=keyboard)
@@ -110,7 +127,7 @@ async def get_sub(message: types.Message):
 async def get_school(message: types.Message):
     """Save school-time to dict"""
 
-    if await is_new_date(message):
+    if await is_right_date_and_id(message):
         new_dict['school'] = get_time()
         keyboard = one_but_keyboard('Confirm')
         keyboard.one_time_keyboard = True
@@ -121,7 +138,7 @@ async def get_school(message: types.Message):
 async def confirm(message: types.Message):
     """Confirm all the data to the database"""
 
-    if await is_new_date(message):
+    if await is_right_date_and_id(message):
         to_base(new_dict)
         new_dict.clear()
         await message.answer('Done')
