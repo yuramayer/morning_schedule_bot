@@ -25,7 +25,7 @@ logging.basicConfig(level=logging.INFO)
 
 @dp.message_handler(commands='clear')
 async def cmd_clear(message: types.Message):
-    """Clearing the dictionary with cache"""
+    """Clearing the cache"""
 
     if await is_right_date_and_id(message):
         new_dict.clear()
