@@ -45,7 +45,7 @@ async def cmd_start(message: types.Message):
             await message.answer('Type /clear to clear the cache', reply_markup=keyboard)
 
 
-async def is_right_date_and_id(message):
+async def is_right_date_and_id(message: types.Message) -> bool:
     """Checking date & id for all the funcs"""
 
     if await is_right_id(message):
@@ -53,7 +53,7 @@ async def is_right_date_and_id(message):
             return True
 
 
-async def is_right_id(message):
+async def is_right_id(message: types.Message) -> bool:
     """Checking the id"""
 
     verifiable_id = int(message.chat.id)
@@ -63,7 +63,7 @@ async def is_right_id(message):
         await message.answer('You\'re not user.')
 
 
-async def is_new_date(message):
+async def is_new_date(message: types.Message) -> bool:
     """Checking the date for unique"""
 
     date = get_date()
@@ -73,7 +73,7 @@ async def is_new_date(message):
         await message.answer('We\'ve already added info for today!')
 
 
-def one_but_keyboard(but_text):
+def one_but_keyboard(but_text: str) -> types.ReplyKeyboardMarkup:
     """Returning keyboard with one button"""
 
     keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
