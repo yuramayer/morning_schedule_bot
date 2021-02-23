@@ -16,6 +16,8 @@ user_id = int(getenv("USER_ID"))
 if not user_id:
     exit('Error: no user id provided')
 
+DB_LENGTH = 6
+
 bot = Bot(token=bot_token)
 
 dp = Dispatcher(bot)
@@ -139,9 +141,19 @@ async def confirm(message: types.Message):
     """Confirm all the data to the database"""
 
     if await is_right_date_and_id(message):
-        to_base(new_dict)
-        new_dict.clear()
-        await message.answer('Done')
+        if await is_dict_filled(message):
+            to_base(new_dict)
+            new_dict.clear()
+            await message.answer('Done')
+
+
+async def is_dict_filled(message: types.Message) -> bool:
+    """Check the dictionary before sending data to base"""
+
+    if len(new_dict) == DB_LENGTH:
+        return True
+    else:
+        await message.answer('You haven\'t typed all the data')
 
 
 if __name__ == '__main__':
