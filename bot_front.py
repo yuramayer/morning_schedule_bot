@@ -29,7 +29,7 @@ logging.basicConfig(level=logging.INFO)
 async def cmd_clear(message: types.Message):
     """Clearing the cache"""
 
-    if await is_right_date_and_id(message):
+    if await is_verified(message):
         new_dict.clear()
         keyboard = one_but_keyboard('New day')
         await message.answer('Dictionary is cleared', reply_markup=keyboard)
@@ -39,7 +39,7 @@ async def cmd_clear(message: types.Message):
 async def cmd_start(message: types.Message):
     """Checking the cache in dict"""
 
-    if await is_right_date_and_id(message):
+    if await is_verified(message):
         keyboard = one_but_keyboard('New day')
         if not new_dict:
             await message.answer('I\'ve got no cache', reply_markup=keyboard)
@@ -47,7 +47,7 @@ async def cmd_start(message: types.Message):
             await message.answer('Type /clear to clear the cache', reply_markup=keyboard)
 
 
-async def is_right_date_and_id(message: types.Message) -> bool:
+async def is_verified(message: types.Message) -> bool:
     """Checking date & id for all the funcs"""
 
     if await is_right_id(message):
@@ -88,7 +88,7 @@ def one_but_keyboard(but_text: str) -> types.ReplyKeyboardMarkup:
 async def get_date_day(message: types.Message):
     """Save date & day to dict"""
 
-    if await is_right_date_and_id(message):
+    if await is_verified(message):
         new_dict['date'] = get_date()
         new_dict['day'] = get_day()
         keyboard = one_but_keyboard('New out')
@@ -99,7 +99,7 @@ async def get_date_day(message: types.Message):
 async def get_out(message: types.Message):
     """Save out-time to dict"""
 
-    if await is_right_date_and_id(message):
+    if await is_verified(message):
         new_dict['out'] = get_time()
         keyboard = one_but_keyboard('New bus')
         await message.answer('Out: success', reply_markup=keyboard)
@@ -109,7 +109,7 @@ async def get_out(message: types.Message):
 async def get_bus(message: types.Message):
     """Save bus-time to dict"""
 
-    if await is_right_date_and_id(message):
+    if await is_verified(message):
         new_dict['bus'] = get_time()
         keyboard = one_but_keyboard('New sub')
         await message.answer('Bus: success', reply_markup=keyboard)
@@ -119,7 +119,7 @@ async def get_bus(message: types.Message):
 async def get_sub(message: types.Message):
     """Save sub-time to dict"""
 
-    if await is_right_date_and_id(message):
+    if await is_verified(message):
         new_dict['sub'] = get_time()
         keyboard = one_but_keyboard('New school')
         await message.answer('Sub: success', reply_markup=keyboard)
@@ -129,7 +129,7 @@ async def get_sub(message: types.Message):
 async def get_school(message: types.Message):
     """Save school-time to dict"""
 
-    if await is_right_date_and_id(message):
+    if await is_verified(message):
         new_dict['school'] = get_time()
         keyboard = one_but_keyboard('Confirm')
         keyboard.one_time_keyboard = True
@@ -140,7 +140,7 @@ async def get_school(message: types.Message):
 async def confirm(message: types.Message):
     """Confirm all the data to the database"""
 
-    if await is_right_date_and_id(message):
+    if await is_verified(message):
         if await is_dict_filled(message):
             to_base(new_dict)
             new_dict.clear()
