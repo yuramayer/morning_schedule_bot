@@ -1,18 +1,18 @@
 import logging
 from aiogram import Bot, Dispatcher, executor, types
 from aiogram.dispatcher.filters import Text
-from os import getenv
+from config import BOT_TOKEN, USER_ID
 from sys import exit
 from bot_backend import get_date, no_date, get_day, get_time, to_base
 
 new_dict = {}
 
-#  Run - Edit Configurations - Environment variables
-bot_token = getenv("BOT_TOKEN")
+#  Add token & id to the config.py
+bot_token = BOT_TOKEN
 if not bot_token:
     exit('Error: no token provided')
 
-user_id = int(getenv("USER_ID"))
+user_id = USER_ID
 if not user_id:
     exit('Error: no user id provided')
 
